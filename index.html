@@ -352,11 +352,132 @@
       font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
       position: sticky; top: 0; z-index: 200;
     }
+
+    /* ─── HAMBURGER ─── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block; width: 24px; height: 1.5px;
+      background: var(--cream); transition: transform 0.3s, opacity 0.3s;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ─── MOBILE MENU DRAWER ─── */
+    .mobile-menu {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(28,28,28,0.97);
+      z-index: 99;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 36px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--cream); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--olive); }
+    .mobile-menu .mobile-reserve {
+      background: var(--olive); color: #fff;
+      padding: 14px 36px; font-size: 0.8rem;
+      margin-top: 12px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      /* Nav */
+      .nav-links, .nav-reserve { display: none; }
+      .nav-hamburger { display: flex; }
+      nav { padding: 18px 24px; }
+
+      /* Hero */
+      .hero-sub { font-size: 0.88rem; }
+
+      /* Intro strip */
+      .intro-strip { padding: 60px 28px; }
+
+      /* Photo grid → 2 cols */
+      .photo-grid { grid-template-columns: repeat(2, 1fr); }
+
+      /* Menu teaser → stacked */
+      .menu-teaser { grid-template-columns: 1fr; }
+      .menu-teaser-text { padding: 64px 32px; }
+      .menu-teaser-image { min-height: 340px; }
+
+      /* Sections */
+      section { padding: 72px 28px; }
+
+      /* Events → stacked, image on top */
+      .events-section { grid-template-columns: 1fr; }
+      .events-image { min-height: 300px; order: 0; }
+      .events-text { padding: 64px 32px; order: 1; }
+
+      /* Instagram → 3 cols */
+      .instagram-grid { grid-template-columns: repeat(3, 1fr); }
+      .instagram-section { padding: 60px 24px; }
+
+      /* Footer → 2 cols */
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+      footer { padding: 60px 28px 32px; }
+    }
+
+    @media (max-width: 560px) {
+      /* Nav */
+      nav { padding: 16px 20px; }
+
+      /* Hero */
+      .hero-headline { font-size: clamp(2.4rem, 10vw, 3.2rem); }
+      .hero-ctas { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-outline { width: 100%; max-width: 280px; text-align: center; }
+
+      /* Intro strip */
+      .intro-strip { padding: 48px 20px; }
+
+      /* Photo grid → 2 cols still fine, reduce height */
+      .photo-tile { aspect-ratio: 1/1; }
+
+      /* Menu teaser */
+      .menu-teaser-text { padding: 48px 20px; }
+      .menu-teaser-image { min-height: 260px; }
+
+      /* Sections */
+      section { padding: 56px 20px; }
+
+      /* Events */
+      .events-text { padding: 48px 20px; }
+      .events-image { min-height: 240px; }
+
+      /* Instagram → 2 cols on small phones */
+      .instagram-grid { grid-template-columns: repeat(2, 1fr); }
+      .instagram-section { padding: 48px 16px; }
+
+      /* Footer → single col */
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      footer { padding: 48px 20px 28px; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .footer-social { justify-content: center; }
+    }
   </style>
 </head>
 <body>
 
   <div class="mockup-banner">Design Mockup — Olivo Mediterranean Fare · For Review Only</div>
+
+  <!-- MOBILE MENU DRAWER -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#" onclick="closeMobileMenu()">Menu</a>
+    <a href="#" onclick="closeMobileMenu()">Reservations</a>
+    <a href="#" onclick="closeMobileMenu()">Events</a>
+    <a href="#" onclick="closeMobileMenu()">About</a>
+    <a href="#" onclick="closeMobileMenu()">Contact</a>
+    <a href="#" class="mobile-reserve btn-primary" onclick="closeMobileMenu()">Reserve a Table</a>
+  </div>
 
   <!-- NAV -->
   <nav>
@@ -369,6 +490,9 @@
       <li><a href="#">Contact</a></li>
     </ul>
     <a href="#" class="nav-reserve">Reserve a Table</a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
 
   <!-- HERO -->
@@ -524,6 +648,7 @@
   </footer>
 
   <script>
+    // ── Carousel ──
     const slides = document.querySelectorAll('.hero-slide');
     const dots = document.querySelectorAll('.hero-dot');
     let current = 0;
@@ -541,6 +666,22 @@
 
     function nextSlide() { goToSlide((current + 1) % slides.length); }
     timer = setInterval(nextSlide, 5000);
+
+    // ── Mobile Menu ──
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    function toggleMobileMenu() {
+      const isOpen = mobileMenu.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
+
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('open');
+      hamburger.classList.remove('open');
+      document.body.style.overflow = '';
+    }
   </script>
 </body>
 </html>
